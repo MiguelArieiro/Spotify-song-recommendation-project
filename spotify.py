@@ -124,21 +124,21 @@ class Sensor:
 			artist_id.append(temp_id)
 			album_name.append(album['name'])
 			album_id.append(album['id'])
-			url.append(album['external_urls'])
+			url.append(album['external_urls']['spotify'])
 			self.spotify.album(album['id'])
 
 		self.releases=[album_id, album_name, url, artist_id, artist_name]
 
 	def __str__(self):
 		string="»Top played artists:\n"
-		temp="\n*Genres:\n"
+		temp="*Genres:\n"
 
 		for i in range (len(self.top[0])):
 			string += self.top[0][i] + ' - ' + self.top[1][i] + '\n'
 			temp += self.top[2][i] + '\n'
 
 		string += temp + "\n\n»Followed artists:\n"
-		temp="\n*Genres:\n"
+		temp="*Genres:\n"
 
 		for i in range (len(self.followed[0])):
 			string += self.followed[0][i] + ' - ' + self.followed[1][i] + '\n'
@@ -152,7 +152,9 @@ class Sensor:
 		string += temp + "\n\n»New releases:\n"
 
 		for i in range (len(self.releases[0])):
-			string += self.releases[0][i] + ' - ' + self.releases[1][i] + '\turl:  ' + self.releases[2][i] + '\n'
+
+
+			string += self.releases[0][i] + ' - ' + self.releases[1][i] + "\turl:  " + self.releases[2][i] + '\n'
 			for j in range (len(self.releases[3][i])):
 				string += '\t-' + self.releases[3][i] + ' - ' + self.releases[4][i] + '\n'
 
