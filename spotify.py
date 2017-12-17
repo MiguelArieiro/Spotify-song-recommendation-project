@@ -19,6 +19,10 @@ class Sensor:
 		scope='user-read-recently-played user-top-read user-follow-read playlist-modify-private playlist-modify-public playlist-read-collaborative playlist-read-private ugc-image-upload user-follow-modify user-follow-read'
 		token = util.prompt_for_user_token(self.username.userID, scope,client_id=self.CLIENT_ID,client_secret=self.CLIENT_SECRET,redirect_uri=self.REDIRECT_URI)
 		self.spotify=spotipy.Spotify(auth=token)
+		self.followed=[]
+		self.top=[]
+		self.related=[]
+		self.releases=[]
 
 
 	def show_tracks(self, tracks):
@@ -98,8 +102,62 @@ class Sensor:
 		self.related=[artist_id, name, count]
 			
 	def getReleases(self):
+		artist_name=[]
+		artist_id=[]
+		album_name=[]
+		album_id=[]
+		genres=[]
+		url=[]
+
+
 		results=self.spotify.new_releases(country=None, limit=50, offset=0)
-		pprint.pprint(results)
+		
+		for album in results['albums']['items']:
+			temp_name=[]
+			temp_id=[]
+
+			for artist in album['artists']:
+				temp_name.append(artist['name'])
+				temp_name.append(artist['id'])
+
+			artist_name.append(temp_name)
+			artist_id.append(temp_id)
+			album_name.append(album['name'])
+			album_id.append(album['id'])
+			url.append(album['external_urls'])
+			self.spotify.album(album['id'])
+
+		self.releases=[album_id, album_name, url, artist_id, artist_name]
+
+	def __str__(self):
+		string="»Top played artists:\n"
+		temp="\n*Genres:\n"
+
+		for i in range (len(self.top[0])):
+			string += self.top[0][i] + ' - ' + self.top[1][i] + '\n'
+			temp += self.top[2][i] + '\n'
+
+		string += temp + "\n\n»Followed artists:\n"
+		temp="\n*Genres:\n"
+
+		for i in range (len(self.followed[0])):
+			string += self.followed[0][i] + ' - ' + self.followed[1][i] + '\n'
+			temp += self.followed[2][i] + '\n'
+
+		string += temp + "\n\n»Related artists:\n"
+
+		for i in range (len(self.related[0])):
+			string += self.related[0][i] + ' - ' + self.related[1][i] + '; ' + str(self.related[2][i]) + '\n'
+		
+		string += temp + "\n\n»New releases:\n"
+
+		for i in range (len(self.releases[0])):
+			string += self.releases[0][i] + ' - ' + self.releases[1][i] + '\turl:  ' + self.releases[2][i] + '\n'
+			for j in range (len(self.releases[3][i])):
+				string += '\t-' + self.releases[3][i] + ' - ' + self.releases[4][i] + '\n'
+
+		return string
+
 
 
 class Artist:
@@ -145,18 +203,13 @@ if __name__ == '__main__':
 	user=User(username)
 
 	spotify=Sensor(user.userID)
-	spotify.getFollowed()
 
 	spotify.getTopArtists()
-	pprint.pprint(spotify.top)
-
-	if 'My Chemical Romance' in spotify.top[1]:
-		print ("this shit's kinda working")
-	else:
-		print("wtf am I doing with my life??????")
-
+	spotify.getFollowed()
 	spotify.getRelatedArtists()
-	pprint.pprint(spotify.related)
-
 	spotify.getReleases()
+
+	print(spotify)
+
+	
 	
