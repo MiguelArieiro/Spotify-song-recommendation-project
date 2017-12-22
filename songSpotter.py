@@ -269,33 +269,40 @@ class Agent:
 			string += self.suggestions[1][i] + "\turl:  " + self.suggestions[2][i] + '\tpoints: ' + str(self.suggestions[6][i]) + '\n'
 			for j in range (len(self.suggestions[3][i])):
 				string += '\t-' + self.suggestions[4][i][j] + '\n'
+			string += '\n'
 
 		return string
 
 def menu ():
-	os.system('cls')
+	if os.name == 'nt':
+		os.system('cls')
+
 	#user's username
 	username=input("Username: ")
-
-	os.system('cls')
+	if os.name == 'nt':
+		os.system('cls')
+	
 	user=User(username)
 	print("Updating user's data...")
 	agent=Agent(user.userID)
 	agent.filter()
 
 	while (True):
-		os.system('cls')
+		if os.name == 'nt':
+			os.system('cls')
 		print("1.Suggested artists")
 		print("2.Suggested releases")
 		print("\n0.Exit\n\n\n")
 		sel=eval(input("Selection: "))
 
 		if (sel==1):
-			os.system("cls")
+			if os.name == 'nt':
+				os.system("cls")
 			agent.spotify.printRelated()
 			input("\nPress Enter to continue...")
 		elif(sel==2):
-			os.system("cls")
+			if os.name == 'nt':
+				os.system("cls")
 			print(agent)
 			input("\nPress Enter to continue...")
 		elif (sel==0):
