@@ -10,6 +10,8 @@ from operator import itemgetter #sorts lists
 
 
 class Sensor:
+
+	#API ACCESS
 	CLIENT_ID='50244e1334d342359b7bd26d72288c0c'
 	CLIENT_SECRET='e45d6cf4ad5349cb9d39a9fa416f0824'
 	REDIRECT_URI='https://localhost:8888/callback'
@@ -23,12 +25,6 @@ class Sensor:
 		self.top=[[],[],[]]
 		self.related=[[],[],[]]
 		self.releases=[[],[],[],[],[]]
-
-
-	def show_tracks(self, tracks):
-		for i, item in enumerate(tracks['items']):
-			track = item['track']
-			print (" %d %32.32s %s" % (i, track['artists'][0]['name'],track['name']))
 
 
 	def getFollowed(self):
@@ -142,10 +138,16 @@ class Sensor:
 		self.releases=[album_id, album_name, url, artist_id, artist_name, genres, points]
 
 	def getInfo(self):
+		#fetches information from the spotify api
 		self.getTopArtists()
 		self.getFollowed()
 		self.getRelatedArtists()
 		self.getReleases()
+
+	def printRelated(self):
+		print("»Related artists:\n")
+		for i in range (len(self.related[0])):
+			print(self.related[1][i] + '\n')
 
 	def __str__(self):
 		string="»Top played artists:\n"
@@ -182,21 +184,15 @@ class User:
 	def __init__ (self, userID):
 		self.userID=userID
 
-class Preferences:
-
-	def __init__ (self, genres, value, spotifyID):
-		self.type=genre
-		self.value=value
-		self.spotifyID=spotifyID
-
-
 class Agent:
+
 	def __init__ (self, username):
 		self.suggestions=[[],[],[],[],[],[],[]]
 		self.spotify=Sensor(username)
+		self.spotify.getInfo()
 
 	def startup(self):
-		self.suggestions=[self.spotify.releases[0][:], self.spotify.releases[1][:], self.spotify.releases[2], self.spotify.releases[3], self.spotify.releases[4], self.spotify.releases[5], self.spotify.releases[6]]
+		self.suggestions=[self.spotify.releases[0][:], self.spotify.releases[1][:], self.spotify.releases[2][:], self.spotify.releases[3][:], self.spotify.releases[4][:], self.spotify.releases[5][:], self.spotify.releases[6][:]]
 
 	def sortSuggestions(self):
 
@@ -255,21 +251,19 @@ class Agent:
 
 
 	def filter(self):
-		self.spotify.getInfo()
-		#print(self.spotify)
 		self.startup()
 
+		#filtra os novos albuns
 		self.filterByTop()
 		self.filterByFollowed()
 		self.filterByRelatedArtists()
 		self.filterByGenre()
 
+		#Ordena as sugestões de albuns
 		self.sortSuggestions()
 
-		print(self)
-
 	def __str__ (self):
-		string = "\n\n»Suggested albums:\n"
+		string = "»Suggested releases:\n"
 
 		for i in range (len(self.suggestions[0])):
 			string += self.suggestions[1][i] + "\turl:  " + self.suggestions[2][i] + '\tpoints: ' + str(self.suggestions[6][i]) + '\n'
@@ -278,21 +272,35 @@ class Agent:
 
 		return string
 
-
-class Lista:
-	def __init__ (self, agent):
-		return
-
-if __name__ == '__main__':
+def menu ():
 	os.system('cls')
 	#user's username
-	username=input("Username:")
+	username=input("Username: ")
+
 	os.system('cls')
 	user=User(username)
+	print("Updating user's data...")
 	agent=Agent(user.userID)
 	agent.filter()
 
-	#print(agent.spotify)
+	while (True):
+		os.system('cls')
+		print("1.Suggested artists")
+		print("2.Suggested releases")
+		print("\n0.Exit\n\n\n")
+		sel=eval(input("Selection: "))
 
-	
+		if (sel==1):
+			os.system("cls")
+			agent.spotify.printRelated()
+			input("\nPress Enter to continue...")
+		elif(sel==2):
+			os.system("cls")
+			print(agent)
+			input("\nPress Enter to continue...")
+		elif (sel==0):
+			break
+
+if __name__ == '__main__':
+	menu()
 	
